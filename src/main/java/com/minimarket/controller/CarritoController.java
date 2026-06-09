@@ -1,0 +1,67 @@
+package com.minimarket.controller;
+
+import com.minimarket.entity.Carrito;
+import com.minimarket.service.CarritoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/carrito")
+public class CarritoController {
+
+    @Autowired
+    private CarritoService carritoService;
+
+    @GetMapping
+    public List<Carrito> listarCarrito() {
+        return carritoService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Carrito> obtenerCarritoPorId(@PathVariable @NonNull Long id) {
+        Carrito carrito = carritoService.findById(id);
+
+        if (carrito != null) {
+            return ResponseEntity.ok(carrito);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping
+    public Carrito agregarProductoAlCarrito(@RequestBody @NonNull Carrito carrito) {
+        return carritoService.save(carrito);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Carrito> actualizarCarrito(
+            @PathVariable @NonNull Long id,
+            @RequestBody @NonNull Carrito carrito) {
+
+        Carrito existente = carritoService.findById(id);
+
+        if (existente != null) {
+            carrito.setId(id);
+            Carrito carritoActualizado = carritoService.save(carrito);
+            return ResponseEntity.ok(carritoActualizado);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarProductoDelCarrito(@PathVariable @NonNull Long id) {
+        Carrito carrito = carritoService.findById(id);
+
+        if (carrito != null) {
+            carritoService.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+}

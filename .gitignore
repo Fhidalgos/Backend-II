@@ -1,0 +1,30 @@
+# Archivos compilados de Java
+*.class
+
+# Directorios de empaquetado y build
+/target/
+/build/
+/out/
+*.jar
+*.war
+*.ear
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# Eclipse / VS Code
+.classpath
+.project
+.settings/
+.vscode/
+
+# Logs y bases de datos locales
+*.log
+*.sqlite
+*.db
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
