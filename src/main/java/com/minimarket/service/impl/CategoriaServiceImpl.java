@@ -4,7 +4,6 @@ import com.minimarket.entity.Categoria;
 import com.minimarket.repository.CategoriaRepository;
 import com.minimarket.service.CategoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,17 +20,17 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
-    public Categoria findById(@NonNull Long id) {
+    public Categoria findById(Long id) {
         return categoriaRepository.findById(id).orElse(null);
     }
 
     @Override
-    public Categoria save(@NonNull Categoria categoria) {
+    public Categoria save(Categoria categoria) {
         return categoriaRepository.save(categoria);
     }
 
     @Override
-    public void deleteById(@NonNull Long id) {
+    public void deleteById(Long id) {
         categoriaRepository.deleteById(id);
     }
 }

@@ -4,7 +4,6 @@ import com.minimarket.entity.Usuario;
 import com.minimarket.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,46 +22,34 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable @NonNull Long id) {
+    public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable Long id) {
         Optional<Usuario> usuario = usuarioService.findById(id);
-
-        if (usuario.isPresent()) {
-            return ResponseEntity.ok(usuario.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return usuario.map(ResponseEntity::ok) // Si el usuario existe, devuelve 200 OK con el usuario
+                .orElseGet(() -> ResponseEntity.notFound().build()); // Si no, devuelve 404
     }
 
     @PostMapping
-    public Usuario guardarUsuario(@RequestBody @NonNull Usuario usuario) {
+    public Usuario guardarUsuario(@RequestBody Usuario usuario) {
         return usuarioService.save(usuario);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> actualizarUsuario(
-            @PathVariable @NonNull Long id,
-            @RequestBody @NonNull Usuario usuario) {
-
+    public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
         Optional<Usuario> usuarioExistente = usuarioService.findById(id);
-
         if (usuarioExistente.isPresent()) {
             usuario.setId(id);
-            Usuario usuarioActualizado = usuarioService.save(usuario);
-            return ResponseEntity.ok(usuarioActualizado);
-        } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(usuarioService.save(usuario));
         }
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarUsuario(@PathVariable @NonNull Long id) {
+    public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         Optional<Usuario> usuario = usuarioService.findById(id);
-
-        if (usuario.isPresent()) {
-            usuarioService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
+        if (usuario.isPresent()) { // Verifica si el usuario existe
+            usuarioService.deleteById(id); // Elimina al usuario
+            return ResponseEntity.noContent().build(); // Respuesta 204 (sin contenido)
         }
+        return ResponseEntity.notFound().build(); // Respuesta 404 (no encontrado)
     }
 }

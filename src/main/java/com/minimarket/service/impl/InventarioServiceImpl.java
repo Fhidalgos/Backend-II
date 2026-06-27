@@ -4,7 +4,6 @@ import com.minimarket.entity.Inventario;
 import com.minimarket.repository.InventarioRepository;
 import com.minimarket.service.InventarioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,22 +20,54 @@ public class InventarioServiceImpl implements InventarioService {
     }
 
     @Override
-    public Inventario findById(@NonNull Long id) {
+    public Inventario findById(Long id) {
         return inventarioRepository.findById(id).orElse(null);
     }
 
     @Override
-    public Inventario save(@NonNull Inventario inventario) {
+    public Inventario save(Inventario inventario) {
         return inventarioRepository.save(inventario);
     }
 
     @Override
-    public void deleteById(@NonNull Long id) {
+    public void deleteById(Long id) {
         inventarioRepository.deleteById(id);
     }
 
     @Override
-    public List<Inventario> findByProductoId(@NonNull Long productoId) {
+    public List<Inventario> findByProductoId(Long productoId) {
         return inventarioRepository.findByProductoId(productoId);
+    }
+
+    @Override
+    public boolean datosMovimientoValidos(Inventario inventario) {
+        if (inventario == null) {
+            return false;
+        }
+        boolean tipoValido = inventario.getTipoMovimiento() != null
+                && !inventario.getTipoMovimiento().trim().isEmpty();
+        boolean cantidadValida = inventario.getCantidad() != null
+                && inventario.getCantidad() > 0;
+        return tipoValido && cantidadValida;
+    }
+
+    @Override
+    public boolean productoEsCorrecto(Inventario inventario, Long productoId) {
+        return inventario != null
+                && inventario.getProducto() != null
+                && inventario.getProducto().getId() != null
+                && inventario.getProducto().getId().equals(productoId);
+    }
+
+    @Override
+    public Inventario registrarMovimiento(Inventario inventario) {
+        if (!datosMovimientoValidos(inventario)) {
+            throw new IllegalArgumentException(
+                    "Datos de movimiento invalidos: tipoMovimiento y cantidad son obligatorios");
+        }
+        if (inventario.getProducto() == null) {
+            throw new IllegalArgumentException("El movimiento debe estar asociado a un producto");
+        }
+        return inventarioRepository.save(inventario);
     }
 }

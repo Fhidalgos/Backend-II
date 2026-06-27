@@ -1,66 +1,140 @@
 package com.minimarket.security.config;
 
-import com.minimarket.security.service.CustomUserDetailsService;
-import com.minimarket.security.util.JwtAuthenticationFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
-
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
+            // Se deshabilita CSRF para facilitar las pruebas de la API REST.
             .csrf(csrf -> csrf.disable())
+
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**", "/h2-console/**", "/public/**").permitAll()
-                .requestMatchers("/productos/**", "/categorias/**").hasAnyRole("CLIENTE", "EMPLEADO", "GERENTE")
-                .requestMatchers("/inventario/**", "/ventas/**", "/detalle-ventas/**").hasAnyRole("EMPLEADO", "GERENTE")
-                .requestMatchers("/usuarios/**", "/roles/**").hasRole("GERENTE")
+
+                // Rutas públicas
+                .requestMatchers(
+                    "/",
+                    "/public/**",
+                    "/login",
+                    "/logout",
+                    "/error"
+                ).permitAll()
+
+                /*
+                 * PRODUCTOS Y CATEGORÍAS
+                 * Todos los usuarios autenticados pueden consultar.
+                 * Solo ADMINISTRADOR puede crear, modificar o eliminar.
+                 */
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/productos/**",
+                    "/api/categorias/**"
+                ).authenticated()
+
+                .requestMatchers(
+                    HttpMethod.POST,
+                    "/api/productos/**",
+                    "/api/categorias/**"
+                ).hasAuthority("ADMINISTRADOR")
+
+                .requestMatchers(
+                    HttpMethod.PUT,
+                    "/api/productos/**",
+                    "/api/categorias/**"
+                ).hasAuthority("ADMINISTRADOR")
+
+                .requestMatchers(
+                    HttpMethod.DELETE,
+                    "/api/productos/**",
+                    "/api/categorias/**"
+                ).hasAuthority("ADMINISTRADOR")
+
+                /*
+                 * INVENTARIO
+                 * CAJERO y ADMINISTRADOR pueden consultar y registrar movimientos.
+                 */
+                .requestMatchers(
+                    "/api/inventario/**"
+                ).hasAnyAuthority("CAJERO", "ADMINISTRADOR")
+
+                /*
+                 * VENTAS
+                 * Solo CAJERO puede generar una venta.
+                 */
+                .requestMatchers(
+                    HttpMethod.POST,
+                    "/api/ventas/**"
+                ).hasAuthority("CAJERO")
+
+                /*
+                 * CAJERO y ADMINISTRADOR pueden consultar ventas
+                 * y sus respectivos detalles.
+                 */
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/ventas/**",
+                    "/api/detalle-ventas/**"
+                ).hasAnyAuthority("CAJERO", "ADMINISTRADOR")
+
+                .requestMatchers(
+                    "/api/detalle-ventas/**"
+                ).hasAnyAuthority("CAJERO", "ADMINISTRADOR")
+
+                /*
+                 * CARRITO
+                 * CLIENTE administra su carrito.
+                 */
+                .requestMatchers(
+                    "/api/carrito/**"
+                ).hasAuthority("CLIENTE")
+
+                /*
+                 * USUARIOS
+                 * Solo ADMINISTRADOR puede acceder a la gestión de usuarios.
+                 */
+                .requestMatchers(
+                    "/api/usuarios/**"
+                ).hasAuthority("ADMINISTRADOR")
+
+                // Cualquier otra ruta requiere autenticación.
                 .anyRequest().authenticated()
             )
-            .authenticationProvider(authenticationProvider())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+
+            // Login proporcionado por Spring Security.
+            .formLogin(form -> form
+                .defaultSuccessUrl("/public/hola", true)
+                .permitAll()
+            )
+
+            // Cierre de sesión.
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/public/hola")
+                .permitAll()
+            );
 
         return http.build();
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
 
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-
-        return authProvider;
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean

@@ -1,19 +1,29 @@
 package com.minimarket.service;
 
 import com.minimarket.entity.Inventario;
-import org.springframework.lang.NonNull;
 
 import java.util.List;
 
 public interface InventarioService {
-
     List<Inventario> findAll();
+    Inventario findById(Long id);
+    Inventario save(Inventario inventario);
+    void deleteById(Long id);
+    List<Inventario> findByProductoId(Long productoId);
 
-    Inventario findById(@NonNull Long id);
+    /**
+     * Indica si los datos del movimiento son validos: tipoMovimiento no nulo ni
+     * vacio (Entrada/Salida) y cantidad no nula y mayor que cero.
+     */
+    boolean datosMovimientoValidos(Inventario inventario);
 
-    Inventario save(@NonNull Inventario inventario);
+    /** Indica si el producto asociado al inventario es el esperado (relacion correcta). */
+    boolean productoEsCorrecto(Inventario inventario, Long productoId);
 
-    void deleteById(@NonNull Long id);
-
-    List<Inventario> findByProductoId(@NonNull Long productoId);
+    /**
+     * Registra un movimiento de inventario validando previamente sus datos y que
+     * tenga un producto asociado.
+     * @throws IllegalArgumentException si los datos del movimiento son invalidos.
+     */
+    Inventario registrarMovimiento(Inventario inventario);
 }

@@ -1,30 +1,33 @@
-# Archivos compilados de Java
-*.class
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-# Directorios de empaquetado y build
-/target/
-/build/
-/out/
-*.jar
-*.war
-*.ear
-
-# IntelliJ IDEA
-.idea/
-*.iml
-*.iws
-
-# Eclipse / VS Code
+### STS ###
+.apt_generated
 .classpath
+.factorypath
 .project
-.settings/
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
 .vscode/
-
-# Logs y bases de datos locales
-*.log
-*.sqlite
-*.db
-
-# Archivos del sistema operativo
-.DS_Store
-Thumbs.db

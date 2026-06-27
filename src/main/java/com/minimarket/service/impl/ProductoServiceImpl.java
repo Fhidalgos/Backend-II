@@ -4,10 +4,10 @@ import com.minimarket.entity.Producto;
 import com.minimarket.repository.ProductoRepository;
 import com.minimarket.service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductoServiceImpl implements ProductoService {
@@ -21,22 +21,39 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
-    public Producto findById(@NonNull Long id) {
+    public Producto findById(Long id) {
         return productoRepository.findById(id).orElse(null);
     }
 
     @Override
-    public Producto save(@NonNull Producto producto) {
+    public Producto save(Producto producto) {
         return productoRepository.save(producto);
     }
 
     @Override
-    public void deleteById(@NonNull Long id) {
+    public void deleteById(Long id) {
         productoRepository.deleteById(id);
     }
 
     @Override
-    public List<Producto> findByCategoriaId(@NonNull Long categoriaId) {
+    public List<Producto> findByCategoriaId(Long categoriaId) {
         return productoRepository.findByCategoriaId(categoriaId);
+    }
+
+    @Override
+    public boolean hayStock(Long productoId, int cantidad) {
+        Optional<Producto> producto = productoRepository.findById(productoId);
+        return producto.isPresent() && producto.get().getStock() >= cantidad;
+    }
+
+    @Override
+    public Producto descontarStock(Long productoId, int cantidad) {
+        Producto producto = productoRepository.findById(productoId)
+                .orElseThrow(() -> new IllegalArgumentException("El producto no existe"));
+        if (producto.getStock() < cantidad) {
+            throw new IllegalArgumentException("Stock insuficiente");
+        }
+        producto.setStock(producto.getStock() - cantidad);
+        return productoRepository.save(producto);
     }
 }

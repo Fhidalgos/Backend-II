@@ -4,7 +4,6 @@ import com.minimarket.entity.Inventario;
 import com.minimarket.service.InventarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,46 +21,33 @@ public class InventarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Inventario> obtenerMovimientoPorId(@PathVariable @NonNull Long id) {
+    public ResponseEntity<Inventario> obtenerMovimientoPorId(@PathVariable Long id) {
         Inventario inventario = inventarioService.findById(id);
-
-        if (inventario != null) {
-            return ResponseEntity.ok(inventario);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return (inventario != null) ? ResponseEntity.ok(inventario) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    public Inventario registrarMovimiento(@RequestBody @NonNull Inventario inventario) {
+    public Inventario registrarMovimiento(@RequestBody Inventario inventario) {
         return inventarioService.save(inventario);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Inventario> actualizarMovimiento(
-            @PathVariable @NonNull Long id,
-            @RequestBody @NonNull Inventario inventario) {
-
+    public ResponseEntity<Inventario> actualizarMovimiento(@PathVariable Long id, @RequestBody Inventario inventario) {
         Inventario existente = inventarioService.findById(id);
-
         if (existente != null) {
             inventario.setId(id);
-            Inventario inventarioActualizado = inventarioService.save(inventario);
-            return ResponseEntity.ok(inventarioActualizado);
-        } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(inventarioService.save(inventario));
         }
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarMovimiento(@PathVariable @NonNull Long id) {
+    public ResponseEntity<Void> eliminarMovimiento(@PathVariable Long id) {
         Inventario inventario = inventarioService.findById(id);
-
         if (inventario != null) {
             inventarioService.deleteById(id);
             return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.notFound().build();
     }
 }
