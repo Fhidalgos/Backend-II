@@ -1,0 +1,1639 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "API MiniMarket Plus",
+        "description": "Microservicio backend de MiniMarket Plus. Expone la gestion de\nproductos, categorias, inventario, carrito de compras, ventas,\ndetalle de ventas y usuarios del sistema.\n\nEsta documentacion se genera con OpenAPI Specification (OAS 3)\nmediante springdoc-openapi, asegurando la consistencia entre el\ncodigo y la documentacion de la API.",
+        "contact": {
+            "name": "Equipo Backend - MiniMarket Plus",
+            "email": "soporte@minimarketplus.cl"
+        },
+        "license": {
+            "name": "Uso academico Duoc UC",
+            "url": "https://www.duoc.cl"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8080",
+            "description": "Entorno de desarrollo local"
+        }
+    ],
+    "security": [
+        {
+            "autenticacionBasica": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "Productos",
+            "description": "Gestion del catalogo de productos de MiniMarket Plus."
+        },
+        {
+            "name": "Ventas",
+            "description": "Registro y consulta de las ventas realizadas en MiniMarket Plus."
+        },
+        {
+            "name": "Inventario",
+            "description": "Registro y consulta de movimientos de inventario (entradas y salidas de stock)."
+        },
+        {
+            "name": "Usuarios",
+            "description": "Gestion de usuarios del sistema y sus roles de acceso."
+        },
+        {
+            "name": "Categorias",
+            "description": "Gestion de las categorias que agrupan los productos del catalogo."
+        },
+        {
+            "name": "Carrito",
+            "description": "Gestion del carrito de compras: productos y cantidades por usuario."
+        },
+        {
+            "name": "Publico",
+            "description": "Endpoint publico de prueba, accesible sin autenticacion."
+        },
+        {
+            "name": "Detalle de ventas",
+            "description": "Consulta y registro de las lineas de detalle de cada venta."
+        }
+    ],
+    "paths": {
+        "/api/usuarios/{id}": {
+            "get": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Obtener usuario por ID",
+                "description": "Devuelve la informacion detallada de un usuario de MiniMarket Plus segun su identificador.",
+                "operationId": "obtenerUsuarioPorId",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del usuario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuario encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Usuario"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Actualizar usuario",
+                "description": "Actualiza los datos de un usuario existente de MiniMarket Plus identificado por su ID.",
+                "operationId": "actualizarUsuario",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del usuario a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Usuario"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "404": {
+                        "description": "Usuario no encontrado"
+                    },
+                    "200": {
+                        "description": "Usuario actualizado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Usuario"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Eliminar usuario",
+                "description": "Elimina un usuario de MiniMarket Plus por su identificador.",
+                "operationId": "eliminarUsuario",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del usuario a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usuario eliminado (sin contenido)"
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            }
+        },
+        "/api/productos/{id}": {
+            "get": {
+                "tags": [
+                    "Productos"
+                ],
+                "summary": "Obtener producto por ID",
+                "description": "Devuelve la informacion detallada de un producto segun su identificador.",
+                "operationId": "obtenerProductoPorId",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del producto",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Producto encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Producto"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Producto no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Productos"
+                ],
+                "summary": "Actualizar producto",
+                "description": "Actualiza los datos de un producto existente identificado por su ID.",
+                "operationId": "actualizarProducto",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del producto a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Producto"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "200": {
+                        "description": "Producto actualizado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Producto"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Producto no encontrado"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Productos"
+                ],
+                "summary": "Eliminar producto",
+                "description": "Elimina un producto del catalogo por su identificador.",
+                "operationId": "eliminarProducto",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del producto a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Producto eliminado (sin contenido)"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Producto no encontrado"
+                    }
+                }
+            }
+        },
+        "/api/inventario/{id}": {
+            "get": {
+                "tags": [
+                    "Inventario"
+                ],
+                "summary": "Obtener movimiento por ID",
+                "description": "Devuelve la informacion detallada de un movimiento de inventario segun su identificador.",
+                "operationId": "obtenerMovimientoPorId",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del movimiento de inventario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Movimiento encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Inventario"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Movimiento no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Inventario"
+                ],
+                "summary": "Actualizar movimiento de inventario",
+                "description": "Actualiza los datos de un movimiento de inventario existente identificado por su ID.",
+                "operationId": "actualizarMovimiento",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del movimiento a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Inventario"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Movimiento actualizado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Inventario"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Movimiento no encontrado"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Inventario"
+                ],
+                "summary": "Eliminar movimiento de inventario",
+                "description": "Elimina un movimiento de inventario por su identificador.",
+                "operationId": "eliminarMovimiento",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del movimiento a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Movimiento eliminado (sin contenido)"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Movimiento no encontrado"
+                    }
+                }
+            }
+        },
+        "/api/detalle-ventas/{id}": {
+            "get": {
+                "tags": [
+                    "Detalle de ventas"
+                ],
+                "summary": "Obtener detalle de venta por ID",
+                "description": "Devuelve la informacion de una linea de detalle de venta segun su identificador.",
+                "operationId": "obtenerDetalleVentaPorId",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del detalle de venta",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "404": {
+                        "description": "Detalle de venta no encontrado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "200": {
+                        "description": "Detalle de venta encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DetalleVenta"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Detalle de ventas"
+                ],
+                "summary": "Actualizar detalle de venta",
+                "description": "Actualiza los datos de una linea de detalle de venta existente identificada por su ID.",
+                "operationId": "actualizarDetalleVenta",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del detalle de venta a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DetalleVenta"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "404": {
+                        "description": "Detalle de venta no encontrado"
+                    },
+                    "200": {
+                        "description": "Detalle de venta actualizado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DetalleVenta"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Detalle de ventas"
+                ],
+                "summary": "Eliminar detalle de venta",
+                "description": "Elimina una linea de detalle de venta por su identificador.",
+                "operationId": "eliminarDetalleVenta",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del detalle de venta a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "404": {
+                        "description": "Detalle de venta no encontrado"
+                    },
+                    "204": {
+                        "description": "Detalle de venta eliminado (sin contenido)"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            }
+        },
+        "/api/categorias/{id}": {
+            "get": {
+                "tags": [
+                    "Categorias"
+                ],
+                "summary": "Obtener categoria por ID",
+                "description": "Devuelve la informacion detallada de una categoria segun su identificador.",
+                "operationId": "obtenerCategoriaPorId",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador de la categoria",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "404": {
+                        "description": "Categoria no encontrada"
+                    },
+                    "200": {
+                        "description": "Categoria encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Categoria"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Categorias"
+                ],
+                "summary": "Actualizar categoria",
+                "description": "Actualiza los datos de una categoria existente identificada por su ID.",
+                "operationId": "actualizarCategoria",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador de la categoria a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Categoria"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "404": {
+                        "description": "Categoria no encontrada"
+                    },
+                    "200": {
+                        "description": "Categoria actualizada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Categoria"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Categorias"
+                ],
+                "summary": "Eliminar categoria",
+                "description": "Elimina una categoria del catalogo por su identificador.",
+                "operationId": "eliminarCategoria",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador de la categoria a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Categoria eliminada (sin contenido)"
+                    },
+                    "404": {
+                        "description": "Categoria no encontrada"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            }
+        },
+        "/api/carrito/{id}": {
+            "get": {
+                "tags": [
+                    "Carrito"
+                ],
+                "summary": "Obtener item del carrito por ID",
+                "description": "Devuelve la informacion detallada de un item del carrito segun su identificador.",
+                "operationId": "obtenerCarritoPorId",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del item del carrito",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item del carrito encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Carrito"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Item del carrito no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Carrito"
+                ],
+                "summary": "Actualizar item del carrito",
+                "description": "Actualiza los datos de un item existente del carrito identificado por su ID.",
+                "operationId": "actualizarCarrito",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del item del carrito a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Carrito"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Item del carrito actualizado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Carrito"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Item del carrito no encontrado"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Carrito"
+                ],
+                "summary": "Eliminar producto del carrito",
+                "description": "Elimina un item del carrito de compras por su identificador.",
+                "operationId": "eliminarProductoDelCarrito",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del item del carrito a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Item del carrito eliminado (sin contenido)"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Item del carrito no encontrado"
+                    }
+                }
+            }
+        },
+        "/api/ventas": {
+            "get": {
+                "tags": [
+                    "Ventas"
+                ],
+                "summary": "Listar ventas",
+                "description": "Obtiene la lista completa de las ventas registradas en MiniMarket Plus.",
+                "operationId": "listarVentas",
+                "responses": {
+                    "200": {
+                        "description": "Lista de ventas obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Venta"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Ventas"
+                ],
+                "summary": "Registrar venta",
+                "description": "Registra una nueva venta en MiniMarket Plus. Requiere un usuario existente.",
+                "operationId": "guardarVenta",
+                "requestBody": {
+                    "description": "Datos de la venta a registrar",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Venta"
+                            },
+                            "examples": {
+                                "Venta nueva": {
+                                    "description": "Venta nueva",
+                                    "value": {
+                                        "usuario": {
+                                            "id": 1
+                                        },
+                                        "fecha": "2026-07-06T15:45:00.000+00:00"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Venta registrada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Venta"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            }
+        },
+        "/api/usuarios": {
+            "get": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Listar usuarios",
+                "description": "Obtiene la lista completa de usuarios registrados en MiniMarket Plus.",
+                "operationId": "listarUsuarios",
+                "responses": {
+                    "200": {
+                        "description": "Lista de usuarios obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Usuario"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Crear usuario",
+                "description": "Registra un nuevo usuario en MiniMarket Plus con sus roles de acceso.",
+                "operationId": "guardarUsuario",
+                "requestBody": {
+                    "description": "Datos del usuario a crear",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Usuario"
+                            },
+                            "examples": {
+                                "Usuario nuevo": {
+                                    "description": "Usuario nuevo",
+                                    "value": {
+                                        "username": "cajero1",
+                                        "password": "clave123",
+                                        "roles": [
+                                            {
+                                                "id": 1
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuario creado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Usuario"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            }
+        },
+        "/api/productos": {
+            "get": {
+                "tags": [
+                    "Productos"
+                ],
+                "summary": "Listar productos",
+                "description": "Obtiene la lista completa de productos del catalogo.",
+                "operationId": "listarProductos",
+                "responses": {
+                    "200": {
+                        "description": "Lista de productos obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Producto"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Productos"
+                ],
+                "summary": "Crear producto",
+                "description": "Registra un nuevo producto en el catalogo. Requiere una categoria existente.",
+                "operationId": "guardarProducto",
+                "requestBody": {
+                    "description": "Datos del producto a crear",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Producto"
+                            },
+                            "examples": {
+                                "Producto nuevo": {
+                                    "description": "Producto nuevo",
+                                    "value": {
+                                        "nombre": "Leche 1L",
+                                        "precio": 1200.0,
+                                        "stock": 30,
+                                        "categoria": {
+                                            "id": 1
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "200": {
+                        "description": "Producto creado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Producto"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/inventario": {
+            "get": {
+                "tags": [
+                    "Inventario"
+                ],
+                "summary": "Listar movimientos de inventario",
+                "description": "Obtiene la lista completa de movimientos de inventario registrados en MiniMarket Plus.",
+                "operationId": "listarMovimientosDeInventario",
+                "responses": {
+                    "200": {
+                        "description": "Lista de movimientos obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Inventario"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Inventario"
+                ],
+                "summary": "Registrar movimiento de inventario",
+                "description": "Registra un nuevo movimiento de inventario (entrada o salida de stock) para un producto existente.",
+                "operationId": "registrarMovimiento",
+                "requestBody": {
+                    "description": "Datos del movimiento de inventario a registrar",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Inventario"
+                            },
+                            "examples": {
+                                "Movimiento nuevo": {
+                                    "description": "Movimiento nuevo",
+                                    "value": {
+                                        "producto": {
+                                            "id": 1
+                                        },
+                                        "cantidad": 20,
+                                        "tipoMovimiento": "Entrada",
+                                        "fechaMovimiento": "2026-07-06T15:30:00.000+00:00"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Movimiento registrado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Inventario"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            }
+        },
+        "/api/detalle-ventas": {
+            "get": {
+                "tags": [
+                    "Detalle de ventas"
+                ],
+                "summary": "Listar detalles de venta",
+                "description": "Obtiene todas las lineas de detalle registradas en las ventas de MiniMarket Plus.",
+                "operationId": "listarDetalleVentas",
+                "responses": {
+                    "200": {
+                        "description": "Lista de detalles de venta obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DetalleVenta"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Detalle de ventas"
+                ],
+                "summary": "Registrar detalle de venta",
+                "description": "Registra una nueva linea de detalle asociada a una venta y un producto existentes.",
+                "operationId": "guardarDetalleVenta",
+                "requestBody": {
+                    "description": "Datos del detalle de venta a registrar",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DetalleVenta"
+                            },
+                            "examples": {
+                                "Detalle de venta nuevo": {
+                                    "description": "Detalle de venta nuevo",
+                                    "value": {
+                                        "venta": {
+                                            "id": 1
+                                        },
+                                        "producto": {
+                                            "id": 1
+                                        },
+                                        "cantidad": 2,
+                                        "precio": 890.0
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "200": {
+                        "description": "Detalle de venta registrado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DetalleVenta"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/categorias": {
+            "get": {
+                "tags": [
+                    "Categorias"
+                ],
+                "summary": "Listar categorias",
+                "description": "Obtiene la lista completa de categorias que agrupan los productos de MiniMarket Plus.",
+                "operationId": "listarCategorias",
+                "responses": {
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "200": {
+                        "description": "Lista de categorias obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Categoria"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Categorias"
+                ],
+                "summary": "Crear categoria",
+                "description": "Registra una nueva categoria para agrupar los productos del catalogo de MiniMarket Plus.",
+                "operationId": "guardarCategoria",
+                "requestBody": {
+                    "description": "Datos de la categoria a crear",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Categoria"
+                            },
+                            "examples": {
+                                "Categoria nueva": {
+                                    "description": "Categoria nueva",
+                                    "value": {
+                                        "nombre": "Abarrotes"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "200": {
+                        "description": "Categoria creada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Categoria"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/carrito": {
+            "get": {
+                "tags": [
+                    "Carrito"
+                ],
+                "summary": "Listar carrito",
+                "description": "Obtiene todos los items del carrito de compras de MiniMarket Plus.",
+                "operationId": "listarCarrito",
+                "responses": {
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "200": {
+                        "description": "Lista de items del carrito obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Carrito"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Carrito"
+                ],
+                "summary": "Agregar producto al carrito",
+                "description": "Agrega un producto con su cantidad al carrito de compras de un usuario en MiniMarket Plus.",
+                "operationId": "agregarProductoAlCarrito",
+                "requestBody": {
+                    "description": "Datos del producto a agregar al carrito",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Carrito"
+                            },
+                            "examples": {
+                                "Item de carrito nuevo": {
+                                    "description": "Item de carrito nuevo",
+                                    "value": {
+                                        "usuario": {
+                                            "id": 1
+                                        },
+                                        "producto": {
+                                            "id": 1
+                                        },
+                                        "cantidad": 3
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Producto agregado al carrito correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Carrito"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            }
+        },
+        "/public/hola": {
+            "get": {
+                "tags": [
+                    "Publico"
+                ],
+                "summary": "Saludo publico",
+                "description": "Endpoint publico de verificacion (health-check simple) que no requiere autenticacion.",
+                "operationId": "holaMundo",
+                "responses": {
+                    "200": {
+                        "description": "Saludo devuelto correctamente",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ventas/{id}": {
+            "get": {
+                "tags": [
+                    "Ventas"
+                ],
+                "summary": "Obtener venta por ID",
+                "description": "Devuelve la informacion detallada de una venta registrada segun su identificador.",
+                "operationId": "obtenerVentaPorId",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador de la venta",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Venta encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Venta"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Venta no encontrada"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Rol": {
+                "required": [
+                    "nombre"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Identificador unico del rol.",
+                        "format": "int64",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "description": "Nombre del rol segun convencion de Spring Security.",
+                        "example": "ROLE_ADMIN"
+                    }
+                },
+                "description": "Rol de autorizacion que agrupa permisos de acceso (RBAC)."
+            },
+            "Usuario": {
+                "required": [
+                    "password",
+                    "username"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Identificador unico del usuario.",
+                        "format": "int64",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "username": {
+                        "type": "string",
+                        "description": "Nombre de usuario unico para autenticarse.",
+                        "example": "admin"
+                    },
+                    "password": {
+                        "type": "string",
+                        "description": "Contrasena del usuario (se almacena cifrada con BCrypt). Solo escritura.",
+                        "writeOnly": true,
+                        "example": "admin123"
+                    },
+                    "roles": {
+                        "uniqueItems": true,
+                        "type": "array",
+                        "description": "Roles asignados al usuario (por ejemplo ROLE_ADMIN).",
+                        "items": {
+                            "$ref": "#/components/schemas/Rol"
+                        }
+                    }
+                },
+                "description": "Usuario del sistema con sus credenciales y roles de acceso."
+            },
+            "Categoria": {
+                "required": [
+                    "nombre"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Identificador unico de la categoria.",
+                        "format": "int64",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "description": "Nombre unico de la categoria.",
+                        "example": "Bebidas"
+                    },
+                    "productos": {
+                        "type": "array",
+                        "description": "Productos asociados a esta categoria.",
+                        "readOnly": true,
+                        "items": {
+                            "$ref": "#/components/schemas/Producto"
+                        }
+                    }
+                },
+                "description": "Categoria que agrupa productos del catalogo (por ejemplo Bebidas o Abarrotes)."
+            },
+            "Producto": {
+                "required": [
+                    "categoria",
+                    "nombre",
+                    "precio",
+                    "stock"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Identificador unico del producto.",
+                        "format": "int64",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "description": "Nombre comercial del producto.",
+                        "example": "Agua Mineral 1L"
+                    },
+                    "precio": {
+                        "type": "number",
+                        "description": "Precio de venta unitario en pesos chilenos.",
+                        "format": "double",
+                        "example": 890.0
+                    },
+                    "stock": {
+                        "type": "integer",
+                        "description": "Cantidad disponible en stock.",
+                        "format": "int32",
+                        "example": 50
+                    },
+                    "categoria": {
+                        "$ref": "#/components/schemas/Categoria"
+                    }
+                },
+                "description": "Producto disponible en el catalogo de MiniMarket Plus."
+            },
+            "Inventario": {
+                "required": [
+                    "cantidad",
+                    "fechaMovimiento",
+                    "producto",
+                    "tipoMovimiento"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Identificador unico del movimiento de inventario.",
+                        "format": "int64",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "producto": {
+                        "$ref": "#/components/schemas/Producto"
+                    },
+                    "cantidad": {
+                        "type": "integer",
+                        "description": "Cantidad de unidades del movimiento.",
+                        "format": "int32",
+                        "example": 20
+                    },
+                    "tipoMovimiento": {
+                        "type": "string",
+                        "description": "Tipo de movimiento: Entrada (reabastecimiento) o Salida (consumo).",
+                        "example": "Entrada",
+                        "enum": [
+                            "Entrada",
+                            "Salida"
+                        ]
+                    },
+                    "fechaMovimiento": {
+                        "type": "string",
+                        "description": "Fecha y hora en que se registro el movimiento.",
+                        "format": "date-time",
+                        "example": "2026-07-06T15:30:00Z"
+                    }
+                },
+                "description": "Movimiento de inventario (entrada o salida de stock) asociado a un producto."
+            },
+            "DetalleVenta": {
+                "required": [
+                    "cantidad",
+                    "precio",
+                    "producto",
+                    "venta"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Identificador unico del detalle de venta.",
+                        "format": "int64",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "venta": {
+                        "$ref": "#/components/schemas/Venta"
+                    },
+                    "producto": {
+                        "$ref": "#/components/schemas/Producto"
+                    },
+                    "cantidad": {
+                        "type": "integer",
+                        "description": "Cantidad de unidades vendidas del producto.",
+                        "format": "int32",
+                        "example": 2
+                    },
+                    "precio": {
+                        "type": "number",
+                        "description": "Precio unitario aplicado al momento de la venta.",
+                        "format": "double",
+                        "example": 890.0
+                    }
+                },
+                "description": "Linea de detalle de una venta: producto, cantidad y precio unitario aplicado."
+            },
+            "Venta": {
+                "required": [
+                    "fecha",
+                    "usuario"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Identificador unico de la venta.",
+                        "format": "int64",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "usuario": {
+                        "$ref": "#/components/schemas/Usuario"
+                    },
+                    "fecha": {
+                        "type": "string",
+                        "description": "Fecha y hora de la venta.",
+                        "format": "date-time",
+                        "example": "2026-07-06T15:45:00Z"
+                    },
+                    "detalles": {
+                        "type": "array",
+                        "description": "Detalle de productos, cantidades y precios de la venta.",
+                        "items": {
+                            "$ref": "#/components/schemas/DetalleVenta"
+                        }
+                    }
+                },
+                "description": "Venta registrada en MiniMarket Plus, con su detalle de productos vendidos."
+            },
+            "Carrito": {
+                "required": [
+                    "cantidad",
+                    "producto",
+                    "usuario"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Identificador unico del item del carrito.",
+                        "format": "int64",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "usuario": {
+                        "$ref": "#/components/schemas/Usuario"
+                    },
+                    "producto": {
+                        "$ref": "#/components/schemas/Producto"
+                    },
+                    "cantidad": {
+                        "type": "integer",
+                        "description": "Cantidad del producto solicitada.",
+                        "format": "int32",
+                        "example": 3
+                    }
+                },
+                "description": "Item del carrito de compras: asocia un producto y una cantidad a un usuario."
+            }
+        },
+        "securitySchemes": {
+            "autenticacionBasica": {
+                "type": "http",
+                "description": "Autenticacion HTTP Basic. Use el usuario y la contrasena semilla (admin / admin123) en el boton Authorize para consumir los endpoints protegidos.",
+                "name": "autenticacionBasica",
+                "scheme": "basic"
+            }
+        }
+    }
+}
