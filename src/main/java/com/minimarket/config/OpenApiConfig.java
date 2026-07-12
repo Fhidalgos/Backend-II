@@ -55,7 +55,7 @@ public class OpenApiConfig {
                                 .url("https://www.duoc.cl")))
                 .servers(List.of(
                         new Server()
-                                .url("http://localhost:8080")
+                                .url("http://localhost:8081")
                                 .description("Entorno de desarrollo local")))
                 // Aplica el esquema de seguridad a nivel global para que Swagger UI
                 // muestre el candado en las operaciones protegidas.

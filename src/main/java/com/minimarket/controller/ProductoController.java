@@ -11,111 +11,268 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("/api/productos")
-@Tag(name = "Productos", description = "Gestion del catalogo de productos de MiniMarket Plus.")
+@Tag(
+        name = "Productos",
+        description = "Gestión del catálogo de productos de MiniMarket Plus con enlaces HATEOAS."
+)
 public class ProductoController {
 
     @Autowired
     private ProductoService productoService;
 
-    @Operation(summary = "Listar productos",
-            description = "Obtiene la lista completa de productos del catalogo.")
+    @Operation(
+            summary = "Listar productos",
+            description = "Obtiene todos los productos e incorpora enlaces HATEOAS."
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista de productos obtenida correctamente",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Producto.class))),
-            @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de productos obtenida correctamente",
+                    content = @Content(
+                            mediaType = "application/hal+json",
+                            schema = @Schema(implementation = CollectionModel.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "No autenticado",
+                    content = @Content
+            )
     })
     @GetMapping
-    public List<Producto> listarProductos() {
-        return productoService.findAll();
+    public CollectionModel<EntityModel<Producto>> listarProductos() {
+
+        List<EntityModel<Producto>> productos = productoService.findAll()
+                .stream()
+                .map(this::crearModeloProducto)
+                .toList();
+
+        return CollectionModel.of(
+                productos,
+
+                linkTo(methodOn(ProductoController.class)
+                        .listarProductos())
+                        .withSelfRel(),
+
+                linkTo(methodOn(InventarioController.class)
+                        .listarMovimientosDeInventario())
+                        .withRel("inventario")
+        );
     }
 
-    @Operation(summary = "Obtener producto por ID",
-            description = "Devuelve la informacion detallada de un producto segun su identificador.")
+    @Operation(
+            summary = "Obtener producto por ID",
+            description = "Devuelve un producto junto con sus enlaces HATEOAS."
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Producto encontrado",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Producto.class))),
-            @ApiResponse(responseCode = "404", description = "Producto no encontrado", content = @Content),
-            @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Producto encontrado",
+                    content = @Content(
+                            mediaType = "application/hal+json",
+                            schema = @Schema(implementation = EntityModel.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Producto no encontrado",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "No autenticado",
+                    content = @Content
+            )
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> obtenerProductoPorId(
-            @Parameter(description = "Identificador del producto", example = "1", required = true)
+    public ResponseEntity<EntityModel<Producto>> obtenerProductoPorId(
+            @Parameter(
+                    description = "Identificador del producto",
+                    example = "1",
+                    required = true
+            )
             @PathVariable Long id) {
+
         Producto producto = productoService.findById(id);
-        return (producto != null) ? ResponseEntity.ok(producto) : ResponseEntity.notFound().build();
+
+        if (producto == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(
+                crearModeloProducto(producto)
+        );
     }
 
-    @Operation(summary = "Crear producto",
-            description = "Registra un nuevo producto en el catalogo. Requiere una categoria existente.")
+    @Operation(
+            summary = "Crear producto",
+            description = "Registra un producto y devuelve enlaces HATEOAS."
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Producto creado correctamente",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Producto.class))),
-            @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Producto creado correctamente",
+                    content = @Content(
+                            mediaType = "application/hal+json",
+                            schema = @Schema(implementation = EntityModel.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "No autenticado",
+                    content = @Content
+            )
     })
     @PostMapping
-    public Producto guardarProducto(
+    public EntityModel<Producto> guardarProducto(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Datos del producto a crear",
-                    content = @Content(examples = @ExampleObject(name = "Producto nuevo",
-                            value = """
-                                    {
-                                      "nombre": "Leche 1L",
-                                      "precio": 1200.0,
-                                      "stock": 30,
-                                      "categoria": { "id": 1 }
-                                    }""")))
+                    description = "Datos del producto que se desea crear",
+                    content = @Content(
+                            examples = @ExampleObject(
+                                    name = "Producto nuevo",
+                                    value = """
+                                            {
+                                              "nombre": "Leche 1L",
+                                              "precio": 1200.0,
+                                              "stock": 30,
+                                              "categoria": {
+                                                "id": 1
+                                              }
+                                            }
+                                            """
+                            )
+                    )
+            )
             @RequestBody Producto producto) {
-        return productoService.save(producto);
+
+        Producto productoGuardado =
+                productoService.save(producto);
+
+        return crearModeloProducto(productoGuardado);
     }
 
-    @Operation(summary = "Actualizar producto",
-            description = "Actualiza los datos de un producto existente identificado por su ID.")
+    @Operation(
+            summary = "Actualizar producto",
+            description = "Actualiza un producto y devuelve sus enlaces HATEOAS."
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Producto actualizado correctamente",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Producto.class))),
-            @ApiResponse(responseCode = "404", description = "Producto no encontrado", content = @Content),
-            @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Producto actualizado correctamente",
+                    content = @Content(
+                            mediaType = "application/hal+json",
+                            schema = @Schema(implementation = EntityModel.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Producto no encontrado",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "No autenticado",
+                    content = @Content
+            )
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizarProducto(
-            @Parameter(description = "Identificador del producto a actualizar", example = "1", required = true)
+    public ResponseEntity<EntityModel<Producto>> actualizarProducto(
+            @Parameter(
+                    description = "Identificador del producto que se actualizará",
+                    example = "1",
+                    required = true
+            )
             @PathVariable Long id,
             @RequestBody Producto producto) {
-        Producto productoExistente = productoService.findById(id);
-        if (productoExistente != null) {
-            producto.setId(id);
-            return ResponseEntity.ok(productoService.save(producto));
+
+        Producto productoExistente =
+                productoService.findById(id);
+
+        if (productoExistente == null) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
+
+        producto.setId(id);
+
+        Producto productoActualizado =
+                productoService.save(producto);
+
+        return ResponseEntity.ok(
+                crearModeloProducto(productoActualizado)
+        );
     }
 
-    @Operation(summary = "Eliminar producto",
-            description = "Elimina un producto del catalogo por su identificador.")
+    @Operation(
+            summary = "Eliminar producto",
+            description = "Elimina un producto mediante su identificador."
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Producto eliminado (sin contenido)", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Producto no encontrado", content = @Content),
-            @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Producto eliminado correctamente",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Producto no encontrado",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "No autenticado",
+                    content = @Content
+            )
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarProducto(
-            @Parameter(description = "Identificador del producto a eliminar", example = "1", required = true)
+            @Parameter(
+                    description = "Identificador del producto que se eliminará",
+                    example = "1",
+                    required = true
+            )
             @PathVariable Long id) {
-        Producto producto = productoService.findById(id);
-        if (producto != null) {
-            productoService.deleteById(id);
-            return ResponseEntity.noContent().build();
+
+        Producto producto =
+                productoService.findById(id);
+
+        if (producto == null) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
+
+        productoService.deleteById(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    private EntityModel<Producto> crearModeloProducto(
+            Producto producto) {
+
+        return EntityModel.of(
+                producto,
+
+                linkTo(methodOn(ProductoController.class)
+                        .obtenerProductoPorId(producto.getId()))
+                        .withSelfRel(),
+
+                linkTo(methodOn(ProductoController.class)
+                        .listarProductos())
+                        .withRel("productos"),
+
+                linkTo(methodOn(InventarioController.class)
+                        .listarMovimientosDeInventario())
+                        .withRel("inventario")
+        );
     }
 }
